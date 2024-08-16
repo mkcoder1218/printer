@@ -1,0 +1,65 @@
+{
+  "name": "Stakeprinter",
+  "version": "1.0.0",
+  "description": "virtual Game Printer Agent",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx kill-port 5002&&electron index.js",
+    "dev": "nodemon --watch main.js --exec 'electron index.js'",
+    "build": "electron-builder --win",
+    "package": "build"
+  },
+  "permissions": [
+    {
+      "name": "printer"
+    }
+  ],
+  "build": {
+    "appId": "Stake.app.id",
+    "productName": "Stake Printer",
+    "directories": {
+      "output": "Stake Printer"
+    },
+    "files": [
+      "node_modules/**/*",
+      "copystamp.jpg",
+      "logo.ico",
+      "index.html",
+      "package.json",
+      "package-lock.json",
+      "copystamp.jpg",
+      "preload.js",
+      "barcode.png",
+      "index.js",
+      "Stake.png"
+    ],
+    "win": {
+      "icon": "logo.ico"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "bwip-js": "^4.3.2",
+    "cors": "^2.8.5",
+    "electron-pos-printer": "^1.3.6",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-settings": "^4.0.2",
+    "express": "^4.18.2",
+    "git": "^0.1.5",
+    "kill-port": "^2.0.1",
+    "moment": "^2.30.1",
+    "path": "^0.12.7",
+    "pure-svg-code": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "electron-reloader": "^1.2.3",
+    "nodemon": "^3.0.3"
+  }
+}

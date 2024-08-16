@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAKE POS PRINTER</title>
+</head>
+<style>
+   body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+   }
+   .container{
+    margin-top: -25px;
+    padding: 0;
+    width: 100%;
+    height: 40vw;
+    background-color: rgb(1, 7, 37);
+   }
+   .head{
+    margin-left: 10%;
+   padding-top: 10px;
+    font-family:Arial;
+    font-size: 25px;
+    color: #fea915;
+    position: relative;
+   }
+     .head p{
+        -webkit-text-stroke: rgba(255, 153, 0, 0.654) 1px;
+        -webkit-text-fill-color: transparent;
+        text-transform: uppercase;
+     }
+    .head::after{
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 2%;
+        background-image: linear-gradient(to right, rgb(239, 255, 22),rgb(79, 74, 74),rgb(0, 0, 0));
+    }
+   
+   .middle_container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+
+   }
+   .middle{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+   }
+.middle select{
+    width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: transparent;
+    color: rgb(0, 134, 134);
+    outline: none;
+    transition: all 0.5s ease-in-out;
+    border-top-left-radius: 0;
+    position: relative;
+}
+.middle::after{
+    content: 'Select Your Printer';
+    position: absolute;
+    font-size: 15px;
+    font-family: monospace;
+    top: 50%;
+    left: 83%;
+    background-color: aliceblue;
+    width: 15%;
+    border-radius: 20px;
+    border-top-left-radius: 0;
+   padding-left: 4px;
+    color: #000000;
+    height: 30%;
+     transition: 0.7s;
+    opacity: 0;
+}
+.middle select:hover{
+   -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: #fea915 0.4px;
+ 
+
+}
+.middle:hover::after{
+opacity: 1;
+}
+.button{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+
+}
+button{
+    width: 30%;
+    padding: 5px;
+    background-color: transparent;
+        color: rgb(0, 134, 134);
+    border: 1px rgba(128, 128, 128, 0.185) solid;
+        border-radius: 10px;
+        box-shadow: 1px 1px 5px 10px rgba(43, 43, 43, 0.098);
+        position: relative;
+      
+}
+button::after{
+  content: "\f02f";
+ font-size: 20px;
+    margin-left: 5px;
+    top:5%;
+    color: cyan;
+    font-weight: 600;
+    border-radius: 15px;
+    transition: 0.5s;
+    left: 0;
+    position: absolute;
+    opacity: 0;
+
+}
+button:hover::after{
+opacity: 1;
+
+}
+button:focus::after{
+right: 2px;
+opacity: 1;
+color: black;
+border: #8d8d8d 1px solid;
+}
+button:hover{
+  background-color: transparent;
+}
+.bottom{
+    width: 100%;
+    font-family: monospace;
+    margin-top: -1%;
+    display: flex;
+   -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: #8d8d8d 1px;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+</style>
+
+<body>
+    <div class="container">
+        <div class="container-chiled">
+            <div class="top">
+            <div class="head">
+                <p>Stake Printer Agent</p>
+            </div>
+            </div>
+            <div class="middle_container">
+            <div class="middle">
+                <select name="" id="sele">
+                </select>
+
+            </div>
+             <div class="button">
+                <button>Check</button>
+            </div>
+            </div>
+           <div class="bottom">
+            <p>Powerd by Stake vertual game provider</p>
+           </div>
+
+        </div>
+    </div>
+    <script>
+        window.ipcRenderer.send('get-printers');
+
+        window.ipcRenderer.on('printersList', (event, printers) => {
+
+            for (let i = 0; i < printers.length; i++) {
+
+                console.log('Received printers:', printers[i].name);
+                const printerListElement = document.getElementById('sele');
+
+                const listItem = document.createElement('option');
+                listItem.textContent = printers[i].name;
+                printerListElement.appendChild(listItem);
+
+            }
+
+            request()
+        });
+
+
+
+
+        function request() {
+            var getpri = localStorage.getItem('printer');
+            var selecter = document.getElementById('sele');
+            for (var i = 0; i < selecter.options.length; i++) {
+                console.log('Comparing:', selecter.options[i].textContent, 'with', getpri);
+                if (selecter.options[i].textContent === getpri) {
+
+                    selecter.options[i].selected = true;
+
+                }
+            }
+            window.ipcRenderer.send('set-default-printer', getpri);
+        }
+
+        document.querySelector('.button').addEventListener('click', () => {
+            const selectedPrinterName = document.getElementById('sele').value;
+            localStorage.setItem('printer', selectedPrinterName)
+            console.log(selectedPrinterName)
+
+            window.ipcRenderer.send('print-request');
+        });
+    </script>
+</body>
+
+</html>
