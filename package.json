@@ -32,7 +32,8 @@
       "preload.js",
       "barcode.png",
       "index.js",
-      "Stake.png"
+      "Kiron.png",
+      "chrome.bat"
     ],
     "win": {
       "icon": "logo.ico"

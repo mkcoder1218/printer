@@ -16,11 +16,70 @@ const homedir = os.homedir();
 var defaultprinter = [];
 const moment = require("moment");
 const { barcode, qrcode, svg2url } = require("pure-svg-code");
+const { execSync,spawn } = require('child_process');
+
+
+const batFilePath = homedir+'/Documents/chrome.bat';
 
 appServer.use(bodyParser.urlencoded({ extended: true }));
 appServer.use(bodyParser.json());
 appServer.use(express.json());
+function killChromeProcesses() {
+  try {
+      execSync('taskkill /F /IM chrome.exe');
+      console.log('All Chrome processes killed.');
+  } catch (error) {
+      console.error('Failed to kill Chrome processes:', error.message);
+  }
+}
 
+// Path to Chrome executable (quoted to handle spaces)
+const chromePath = `"${path.join('C:', 'Program Files', 'Google', 'Chrome', 'Application', 'chrome.exe')}"`;
+
+// Function to check if Chrome executable exists
+function checkChromePath() {
+  try {
+      execSync(`if not exist ${chromePath} exit /b 1`, { shell: true });
+      console.log('Chrome executable found.');
+      return true;
+  } catch (error) {
+      console.error('Chrome executable not found. Please check the path.');
+      return false;
+  }
+}
+
+// Function to start Chrome with the necessary flags
+function startChrome() {
+  const chromeFlags = [
+      '--disable-web-security',
+      '--user-data-dir="C:\\chrome_dev_temp"',
+      '--allow-file-access-from-files',
+      '--enable-local-file-accesses',
+      'http://staketestbucket.s3-website.us-east-2.amazonaws.com/index.html'
+  ];
+
+  const chrome = spawn(chromePath, chromeFlags, { shell: true });
+
+  chrome.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+  });
+
+  chrome.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+  });
+
+  chrome.on('close', (code) => {
+      console.log(`Chrome process exited with code ${code}`);
+  });
+}
+
+// Main execution
+killChromeProcesses();
+
+if (checkChromePath()) {
+  // Wait for a few seconds to ensure Chrome is ready
+  setTimeout(startChrome, 5000);
+}
 const activePrintJobs2 = {};
 function generateRandomString(length = 15) {
   const characters =
@@ -41,7 +100,7 @@ appServer.post("/PrintResult", async (req, res) => {
   console.log("Data", data);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -224,13 +283,12 @@ appServer.post("/printTicket", async (req, res) => {
   } = req.body;
   const isCopyparse = JSON.parse(req.body.isCopy);
   const isCopy = isCopyparse.isCopy;
-  console.log("req:", isCopy);
+  console.log("req:", req.body);
   console.log("copy flag: " + JSON.stringify(req.body));
-
   const printJobId = generatePrintJobId(betSlipNumber, stake, minPayout);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -240,7 +298,7 @@ appServer.post("/printTicket", async (req, res) => {
   };
 
   const individualTickets = [];
-
+  const hasPlayerName=tickets.some(ticketer=>ticketer.hasOwnProperty('playerName'))
   for (let ticket of tickets) {
     const keys = Object.keys(ticket);
 
@@ -253,11 +311,11 @@ appServer.post("/printTicket", async (req, res) => {
     ) {
       title = "Heads and Tails";
     }
-
+console.log('title:',title)
     for (let key of keys) {
       if (key === "stake") {
         const right = {
-          type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+          type: "text", 
           value: "Br " + ticket[key].toLocaleString("en-us") + ".00",
           style: {
             fontFamily: "arial",
@@ -269,7 +327,7 @@ appServer.post("/printTicket", async (req, res) => {
         };
 
         const left = {
-          type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+          type: "text", 
           value: title,
           style: {
             fontFamily: "arial",
@@ -285,9 +343,10 @@ appServer.post("/printTicket", async (req, res) => {
         left !== null && individualTickets.push(right);
         right !== null && individualTickets.push(left);
       } else {
+       
         const left = {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-          value: key !== "oddType" ? ticket[key] : "",
+          value: key !== "oddType" &&key==='selected'&&hasPlayerName?ticket["selected"].split(' ')[0]+'.'+ticket["playerName"]+' '+ticket['selected'].split(' ')[1]:key !=='oddType'&&key!=='playerName'? ticket[key]:'',
           style: {
             fontFamily: "arial",
             fontWeight: "300",
@@ -547,7 +606,7 @@ appServer.post("/printRedeem", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, redeemedAmount, status);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -715,7 +774,7 @@ appServer.post("/printCancel", async (req, res) => {
   );
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -879,7 +938,7 @@ appServer.post("/printSummary", async (req, res) => {
   const printJobId = generatePrintJobId(cancellations, redeemed, cashierName);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1157,7 +1216,7 @@ function printReceipt() {
   console.log(defaultprinter[0]);
   const printTime = new Date().toLocaleTimeString();
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1497,7 +1556,7 @@ function printReceipt() {
     barWidth: 1,
     barHeight: 19,
   });
-  fs.writeFile(homedir + "/Documents" + "/barcode.svg", svgString, (result) => {
+  fs.writeFile(homedir + "/Documents" + "/db/barcode.svg", svgString, (result) => {
     console.log(result);
 
     barcodeData = {
@@ -1508,7 +1567,7 @@ function printReceipt() {
         left: "11%",
       },
       type: "image",
-      path: homedir + "/Documents" + "/barcode.svg",
+      path: homedir + "/Documents" + "/db/barcode.svg",
       height: 20,
     };
     const printdata = [...data, barcodeData];
@@ -1576,8 +1635,25 @@ appServer.options("*", cors());
 
 app.whenReady().then(() => {
   const server = appServer.listen(port, "0.0.0.0", () => {
-    console.log(`Server is running on http://0.0.0.0:${port}`);
+    console.log(`Server is running on http://127.0.0.1:${port}`);
   });
+// try{
+// exec(`"${batFilePath}"`, (error, stdout, stderr) => {
+//     if (error) {
+//         console.error(`Error executing batch file: ${error.message}`);
+//         return;
+//     }
 
+//     if (stderr) {
+//         console.error(`stderr: ${stderr}`);
+//         return;
+//     }
+
+//     console.log(`stdout: ${stdout}`);
+// });
+// }
+// catch(err){
+//   console.log(err)
+// }
   createwindow();
 });
