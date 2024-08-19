@@ -100,7 +100,7 @@ appServer.post("/PrintResult", async (req, res) => {
   console.log("Data", data);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -288,7 +288,7 @@ appServer.post("/printTicket", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, stake, minPayout);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -399,7 +399,7 @@ console.log('title:',title)
     },
     {
       type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-      value: gameStart,
+      value: gameStart.split(' ')[0]+' '+gameStart.split(' ')[1],
       style: {
         fontFamily: "arial",
         fontWeight: "300",
@@ -426,7 +426,7 @@ console.log('title:',title)
     (result) => {
       console.log(result);
 
-      barcodeData = {
+      barcodeData ={ 
         style: {
           width: "75%",
           margin: "-30px auto",
@@ -438,15 +438,33 @@ console.log('title:',title)
         type: "image",
         path: homedir + "/Documents" + "/db/barcode.svg",
         height: 20,
-      };
+}
+        
+      
+      
 
       const filePath = path.join(__dirname, "copystamp.jpg");
 
       console.log("barcode data: ", barcodeData);
-
+const theAtext= {
+  type: "text", 
+  value: "A0A8CD97D9",
+  style: {
+    fontFamily: "Arial",
+    fontSize: "12px",
+    color: "black",
+    width: "80%",
+    display: "flex",
+    justifyContent: "center",
+    position:'absolute',
+    top:'39%',
+    left:'5%'
+    
+  },
+}
       const endData = [
         {
-          type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+          type: "text", 
           value: "Br " + stake.toLocaleString("en-us") + ".00",
           style: {
             fontFamily: "arial",
@@ -457,7 +475,7 @@ console.log('title:',title)
           },
         },
         {
-          type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
+          type: "text",
           value: "Total Stake",
           style: {
             fontFamily: "arial",
@@ -481,7 +499,7 @@ console.log('title:',title)
             width: "88%",
             fontWeight: "600",
             textAlign: "left",
-            padding: "1.6px",
+            padding: "1px",
             margin: "0px 0px 0px 10px",
           },
           value: "Min Payout(incl. Stake)",
@@ -506,7 +524,7 @@ console.log('title:',title)
           value: "Max Payout(incl. Stake)",
           style: {
             fontFamily: "arial",
-            padding: "1.6px",
+            padding: "1px",
             border: "1px solid #595959",
             fontSize: "12px",
             fontWeight: "600",
@@ -540,6 +558,7 @@ console.log('title:',title)
           },
         },
         barcodeData,
+        theAtext,
         {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
           value: `*${betSlipNumber.toLocaleString()}*`,
@@ -565,7 +584,7 @@ console.log('title:',title)
             zIndex: -1,
             opacity: 0.6,
             position: "absolute",
-            top: "100px",
+            top: "94px",
             left: "50%",
             height: "120px",
             transform: "translate(-50%, -50%)",
@@ -575,8 +594,8 @@ console.log('title:',title)
 
       var dataToPrint =
         isCopy === true
-          ? [...headData, ...individualTickets, ...endData, ...copyTag]
-          : [...headData, ...individualTickets, ...endData];
+          ? [...headData, ...individualTickets,theAtext, ...endData, ...copyTag]
+          : [...headData, ...individualTickets,theAtext, ...endData];
       PosPrinter.print(dataToPrint, options)
         .then(console.log("printed"))
 
@@ -606,7 +625,7 @@ appServer.post("/printRedeem", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, redeemedAmount, status);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -774,7 +793,7 @@ appServer.post("/printCancel", async (req, res) => {
   );
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -938,7 +957,7 @@ appServer.post("/printSummary", async (req, res) => {
   const printJobId = generatePrintJobId(cancellations, redeemed, cashierName);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1216,7 +1235,7 @@ function printReceipt() {
   console.log(defaultprinter[0]);
   const printTime = new Date().toLocaleTimeString();
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
