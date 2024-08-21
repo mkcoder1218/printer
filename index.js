@@ -100,7 +100,7 @@ appServer.post("/PrintResult", async (req, res) => {
   console.log("Data", data);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -114,7 +114,7 @@ appServer.post("/PrintResult", async (req, res) => {
       value: data.cashierName,
       style: {
         position: "absolute",
-        right: "6%",
+        right: "8%",
         fontFamily: "Arial",
       },
     },
@@ -123,18 +123,18 @@ appServer.post("/PrintResult", async (req, res) => {
       value: data.shopName,
       style: {
         position: "absolute",
-        right: "6%",
-        top: "2%",
+        right: "8%",
+        top: "3%",
         fontFamily: "Arial",
       },
     },
     {
       type: "text",
-      value: data.date,
+      value: data.formattedTime,
       style: {
         position: "absolute",
-        right: "6%",
-        top: "3%",
+        right: "8%",
+        top: "5%",
         fontFamily: "Arial",
       },
     },
@@ -146,7 +146,7 @@ appServer.post("/PrintResult", async (req, res) => {
       style: {
         position: "absolute",
         left: "35%",
-        top: "5%",
+        top: "7%",
         fontWeight: "bold",
         fontSize: "15px",
         fontFamily: "Arial",
@@ -160,7 +160,7 @@ appServer.post("/PrintResult", async (req, res) => {
       style: {
         position: "absolute",
         left: "5%",
-        top: "7%",
+        top: "9%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -171,7 +171,7 @@ appServer.post("/PrintResult", async (req, res) => {
       style: {
         position: "absolute",
         left: "5%",
-        top: "8%",
+        top: "11%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -182,7 +182,7 @@ appServer.post("/PrintResult", async (req, res) => {
       style: {
         position: "absolute",
         left: "5%",
-        top: "9%",
+        top: "13%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -194,8 +194,8 @@ appServer.post("/PrintResult", async (req, res) => {
       value: data.Game,
       style: {
         position: "absolute",
-        right: "6%",
-        top: "7%",
+        right: "8%",
+        top: "9%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -205,8 +205,8 @@ appServer.post("/PrintResult", async (req, res) => {
       value: data.eventId,
       style: {
         position: "absolute",
-        right: "6%",
-        top: "8%",
+        right: "8%",
+        top: "11%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -216,8 +216,8 @@ appServer.post("/PrintResult", async (req, res) => {
       value: data.formattedTime,
       style: {
         position: "absolute",
-        right: "6%",
-        top: "9%",
+        right: "8%",
+        top: "13%",
         fontWeight: "bold",
         fontFamily: "Arial",
       },
@@ -226,11 +226,83 @@ appServer.post("/PrintResult", async (req, res) => {
   const results = [
     {
       type: "text",
-      value: data.result,
+      value:
+        data.Game === "Keno"
+          ? data.result.split(" ").slice(0, 17)
+          : data.Game === "Spin And Win"
+          ? data.result
+          : data.result[0],
       style: {
         position: "absolute",
-        right: "1%",
-        top: "10%",
+        left: "5%",
+        top: "15%",
+        fontFamily: "Arial",
+      },
+    },
+    {
+      type: "text",
+      value:
+        data.Game === "Keno"
+          ? data.result.split(" ").slice(17)
+          : data.Game === "Spin And Win"
+          ? ""
+          : data.result[1],
+      style: {
+        position: "absolute",
+        left: "5%",
+        top: "17%",
+        fontFamily: "Arial",
+      },
+    },
+    {
+      type: "text",
+      value:
+        data.Game === "Keno" || data.Game === "Spin And Win"
+          ? ""
+          : data.result[0],
+      style: {
+        position: "absolute",
+        left: "5%",
+        top: "19%",
+        fontFamily: "Arial",
+      },
+    },
+    {
+      type: "text",
+      value:
+        data.Game === "Keno" || data.Game === "Spin And Win"
+          ? ""
+          : data.Market[1] +','+ data.Market[2],
+      style: {
+        position: "absolute",
+        left: "5%",
+        top: "21%",
+        fontFamily: "Arial",
+      },
+    },
+    {
+      type: "text",
+      value:
+        data.Game === "Keno" || data.Game === "Spin And Win"
+          ? ""
+          : data.Market[3],
+      style: {
+        position: "absolute",
+        left: "5%",
+        top: "23%",
+        fontFamily: "Arial",
+      },
+    },
+    {
+      type: "text",
+      value:
+        data.Game === "Keno" || data.Game === "Spin And Win"
+          ? ""
+          : data.Market[4] ,
+      style: {
+        position: "absolute",
+        left: "5%",
+        top: "25%",
         fontFamily: "Arial",
       },
     },
@@ -238,13 +310,15 @@ appServer.post("/PrintResult", async (req, res) => {
   const middleBottom = [
     {
       type: "text",
-      value: generateRandomString(),
+      value: generateRandomString().toUpperCase(),
       style: {
         position: "absolute",
         left: "30%",
-        top: "14%",
+        top: "28%",
         fontSize: "10px",
         fontFamily: "Arial",
+        fontWeight: 'bold',
+        marginTop:'10px'
       },
     },
   ];
@@ -288,7 +362,7 @@ appServer.post("/printTicket", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, stake, minPayout);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -322,13 +396,16 @@ console.log('title:',title)
             fontWeight: "600",
             textAlign: "right",
             fontSize: "11px",
-            margin: "0px 20px 0px 0px",
+            margin: "0px 30px 0px 0px",
           },
         };
 
         const left = {
-          type: "text", 
-          value: title,
+          type: "text",
+          value:
+            ticket.oddType !== "Odd/Even"
+              ? title.charAt(0).toUpperCase() + title.slice(1).toLowerCase()
+              : ticket.oddType,
           style: {
             fontFamily: "arial",
             fontWeight: "600",
@@ -346,7 +423,20 @@ console.log('title:',title)
        
         const left = {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-          value: key !== "oddType" &&key==='selected'&&hasPlayerName?ticket["selected"].split(' ')[0]+'.'+ticket["playerName"]+' '+ticket['selected'].split(' ')[1]:key !=='oddType'&&key!=='playerName'? ticket[key]:'',
+          value:
+            key !== "oddType" &&
+            key === "selected" &&
+            hasPlayerName &&
+            ticket["game"].split(" ")[0] !== "Keno" &&
+            ticket["game"].split(" ")[0] !== "Spin"
+              ? ticket["selected"].split(" ")[0] +
+                "." +
+                ticket["playerName"] +
+                " " +
+                ticket["selected"].split(" ")[1]
+              : key !== "oddType" && key !== "playerName" && key !== "selected"
+              ? ticket[key]:key === "selected"?ticket['selected']
+              : "",
           style: {
             fontFamily: "arial",
             fontWeight: "300",
@@ -372,7 +462,7 @@ console.log('title:',title)
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "2px 20px 0px 0px",
+        margin: "2px 30px 0px 0px",
       },
     },
     {
@@ -383,7 +473,7 @@ console.log('title:',title)
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "2px 20px 0px 0px",
+        margin: "2px 30px 0px 0px",
       },
     },
     {
@@ -394,7 +484,7 @@ console.log('title:',title)
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -405,7 +495,7 @@ console.log('title:',title)
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "2px 20px 10px 0px",
+        margin: "2px 30px 10px 0px",
       },
     },
   ];
@@ -426,10 +516,10 @@ console.log('title:',title)
     (result) => {
       console.log(result);
 
-      barcodeData ={ 
+      barcodeData = {
         style: {
-          width: "75%",
-          margin: "-30px auto",
+          width: "78%",
+          margin: "-30px 25px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -438,7 +528,7 @@ console.log('title:',title)
         type: "image",
         path: homedir + "/Documents" + "/db/barcode.svg",
         height: 20,
-}
+      };
         
       
       
@@ -446,32 +536,31 @@ console.log('title:',title)
       const filePath = path.join(__dirname, "copystamp.jpg");
 
       console.log("barcode data: ", barcodeData);
-const theAtext= {
-  type: "text", 
+const theAtext = {
+  type: "text",
   value: "A0A8CD97D9",
   style: {
     fontFamily: "Arial",
-    fontSize: "12px",
-    color: "black",
-    width: "80%",
-    display: "flex",
-    justifyContent: "center",
-    position:'absolute',
-    top:'39%',
-    left:'5%'
-    
+    fontWeight: "300",
+    textAlign: "center",
+    width: "100%",
+    fontSize: "10px",
+    margin: "0px 0px 0px 2px",
+    position: "relative",
+    top: "30px",
+    marginLeft:'-10px'
   },
-}
+};
       const endData = [
         {
-          type: "text", 
+          type: "text",
           value: "Br " + stake.toLocaleString("en-us") + ".00",
           style: {
             fontFamily: "arial",
             fontWeight: "600",
             textAlign: "right",
             fontSize: "12px",
-            margin: "0px 20px -8px 0px",
+            margin: "0px 30px -8px 0px",
           },
         },
         {
@@ -496,13 +585,13 @@ const theAtext= {
             flexDirection: "column",
             border: "1px solid #595959",
             borderBottom: "none",
-            width: "88%",
+            width: "85%",
             fontWeight: "600",
             textAlign: "left",
             padding: "1px",
             margin: "0px 0px 0px 10px",
           },
-          value: "Min Payout(incl. Stake)",
+          value: "Min Payout(Incl. Stake)",
         },
         {
           type: "text",
@@ -511,7 +600,7 @@ const theAtext= {
             fontSize: "12px",
             fontWeight: "600",
             textAlign: "right",
-            margin: "0px 20px 0px 0px",
+            margin: "0px 30px 0px 0px",
             display: "flex",
             flexDirection: "column",
             position: "relative",
@@ -521,7 +610,7 @@ const theAtext= {
         },
         {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-          value: "Max Payout(incl. Stake)",
+          value: "Max Payout(Incl. Stake)",
           style: {
             fontFamily: "arial",
             padding: "1px",
@@ -536,7 +625,7 @@ const theAtext= {
             flexDirection: "column",
             position: "relative",
             bottom: "15px",
-            width: "88%",
+            width: "85%",
           },
         },
         {
@@ -550,7 +639,7 @@ const theAtext= {
             fontWeight: "600",
             textAlign: "right",
             fontSize: "12px",
-            margin: "0px 20px 0px 0px",
+            margin: "0px 30px 0px 0px",
             display: "flex",
             flexDirection: "column",
             position: "relative",
@@ -558,7 +647,7 @@ const theAtext= {
           },
         },
         barcodeData,
-        theAtext,
+
         {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
           value: `*${betSlipNumber.toLocaleString()}*`,
@@ -566,14 +655,15 @@ const theAtext= {
             fontFamily: "Arial",
             fontWeight: "300",
             textAlign: "center",
-            width: "100%",
+            width: "95%",
             fontSize: "10px",
-            margin: "0px 0px 0px 2px",
+            margin: "0px 10px 0px 2px",
             position: "relative",
             top: "30px",
             letterSpacing: "8px",
           },
         },
+        theAtext,
       ];
 
       const copyTag = [
@@ -594,8 +684,8 @@ const theAtext= {
 
       var dataToPrint =
         isCopy === true
-          ? [...headData, ...individualTickets,theAtext, ...endData, ...copyTag]
-          : [...headData, ...individualTickets,theAtext, ...endData];
+          ? [...headData, ...individualTickets, ...endData, ...copyTag]
+          : [...headData, ...individualTickets, ...endData];
       PosPrinter.print(dataToPrint, options)
         .then(console.log("printed"))
 
@@ -618,14 +708,15 @@ appServer.post("/printRedeem", async (req, res) => {
     betSlipNumber,
     redeemedAmount,
     status,
+    tickets
   } = req.body;
 
   const printTime = new Date().toLocaleTimeString();
-
+console.log('reqbody:',req.body)
   const printJobId = generatePrintJobId(betSlipNumber, redeemedAmount, status);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -643,7 +734,7 @@ appServer.post("/printRedeem", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -654,7 +745,7 @@ appServer.post("/printRedeem", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -665,7 +756,7 @@ appServer.post("/printRedeem", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -676,21 +767,69 @@ appServer.post("/printRedeem", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 16px 0px",
+        margin: "6px 30px 16px 0px",
       },
     },
   ];
+  const winnigTicket = []
 
+  for (let ticket in tickets) {
+    const key=Object.keys(ticket)
+    winnigTicket.push(
+      {
+        type: "text",
+        value: tickets[ticket].oddType,
+        style: {
+          fontFamily: "Arial",
+          fontSize: "12px",
+          color: "black",
+          textAlign: "start",
+          fontWeight: "bold",
+        },
+      },
+      {
+        type: "text",
+        value: tickets[ticket].stake + ".00",
+        style: {
+          fontFamily: "Arial",
+          fontSize: "12px",
+          color: "black",
+          textAlign: "end",
+          fontWeight: "bold",
+        },
+      },
+      {
+        type: "text",
+        value: tickets[ticket].game,
+        style: {
+          fontFamily: "Arial",
+          fontSize: "12px",
+          color: "black",
+          textAlign: "start",
+        },
+      },
+      {
+        type: "text",
+        value: tickets[ticket].selected,
+        style: {
+          fontFamily: "Arial",
+          fontSize: "12px",
+          color: "black",
+          textAlign: "start",
+        },
+      }
+    );
+  }
   const middleData = [
     {
       type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
       value: "Redeem Receipt",
       style: {
         fontFamily: "Roboto",
-        fontWeight: "600",
+        fontWeight: "bold",
         textAlign: "center",
         fontSize: "12px",
-        marginBottom: "10px",
+        marginBottom: "2px",
       },
     },
     {
@@ -698,9 +837,10 @@ appServer.post("/printRedeem", async (req, res) => {
       value: betSlipNumber,
       style: {
         fontFamily: "Roboto",
-        fontWeight: "600",
+        fontWeight: "bold",
         textAlign: "center",
         fontSize: "12px",
+        
       },
     },
   ];
@@ -714,7 +854,7 @@ appServer.post("/printRedeem", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "6px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -722,12 +862,12 @@ appServer.post("/printRedeem", async (req, res) => {
       value: "Redeemed Amount",
       style: {
         fontFamily: "Roboto",
-        fontWeight: "500",
+        fontWeight: "bold",
         textAlign: "left",
         fontSize: "11px",
-        margin: "0px 0px 0px 10px",
+        margin: "0px 0px 0px 5px",
         position: "relative",
-        bottom: "10px",
+        bottom: "2px",
       },
     },
     {
@@ -735,11 +875,10 @@ appServer.post("/printRedeem", async (req, res) => {
       value: printTime,
       style: {
         fontFamily: "Roboto",
-        bottom: "12px",
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -747,12 +886,11 @@ appServer.post("/printRedeem", async (req, res) => {
       value: "Redeemed Time",
       style: {
         fontFamily: "Roboto",
-        fontWeight: "500",
+        fontWeight: "bold",
         textAlign: "left",
         fontSize: "11px",
-        margin: "0px 0px 0px 10px",
+        margin: "0px 0px 0px 5px",
         position: "relative",
-        bottom: "12px",
       },
     },
     {
@@ -760,10 +898,22 @@ appServer.post("/printRedeem", async (req, res) => {
       value: status,
       style: {
         fontFamily: "Roboto",
-        fontWeight: "600",
+        fontWeight: "bold",
         textAlign: "center",
         marginTop: "10px",
         fontSize: "12px",
+      },
+    },
+    ...winnigTicket,
+    {
+      type: "text",
+      value: "A0A8CD97D9",
+      style: {
+        fontFamily: "Arial",
+        fontSize: "12px",
+        color: "black",
+        textAlign: "center",
+        fontWeight: "bold",
       },
     },
   ];
@@ -793,7 +943,7 @@ appServer.post("/printCancel", async (req, res) => {
   );
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -811,7 +961,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -822,7 +972,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -833,7 +983,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -844,7 +994,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 16px 0px",
+        margin: "6px 30px 16px 0px",
       },
     },
   ];
@@ -882,7 +1032,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -907,7 +1057,7 @@ appServer.post("/printCancel", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -957,7 +1107,7 @@ appServer.post("/printSummary", async (req, res) => {
   const printJobId = generatePrintJobId(cancellations, redeemed, cashierName);
 
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -986,7 +1136,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 0px 0px",
+        margin: "6px 30px 0px 0px",
       },
     },
     {
@@ -997,7 +1147,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "300",
         textAlign: "right",
         fontSize: "10px",
-        margin: "6px 20px 16px 0px",
+        margin: "6px 30px 16px 0px",
       },
     },
   ];
@@ -1038,7 +1188,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "600",
         textAlign: "right",
         fontSize: "12px",
-        margin: "2px 20px 0px 0px",
+        margin: "2px 30px 0px 0px",
       },
     },
     {
@@ -1064,7 +1214,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -1090,7 +1240,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -1142,7 +1292,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -1168,7 +1318,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "500",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -1194,7 +1344,7 @@ appServer.post("/printSummary", async (req, res) => {
         fontWeight: "600",
         textAlign: "right",
         fontSize: "12px",
-        margin: "0px 20px 0px 0px",
+        margin: "0px 30px 0px 0px",
       },
     },
     {
@@ -1235,7 +1385,7 @@ function printReceipt() {
   console.log(defaultprinter[0]);
   const printTime = new Date().toLocaleTimeString();
   const options = {
-    preview: false,
+    preview: true,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
