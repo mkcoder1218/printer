@@ -1720,8 +1720,8 @@ function printReceipt() {
     },
   ];
 
-  var svgString = barcode("9234567890128", "code128", {
-    width: "110",
+  var svgString = barcode("A9234567890128B", "codabar", {
+    width: "50",
     barWidth: 1,
     barHeight: 19,
   });
