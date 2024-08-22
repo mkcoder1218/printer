@@ -100,7 +100,7 @@ appServer.post("/PrintResult", async (req, res) => {
   console.log("Data", data);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -362,7 +362,7 @@ appServer.post("/printTicket", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, stake, minPayout);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -504,21 +504,28 @@ console.log('title:',title)
 
   console.log("request incoming....");
 
-  var svgString = barcode(betSlipNumber.toLocaleString(), "code128", {
-    width: "100",
-    barWidth: 5,
-    barHeight: 20,
+  const svg = await bwipjs.toSVG({
+    bcid: "code39", // Use 'code128' for 16-digit barcode
+    text: betSlipNumber, // Encode only the original code (without asterisks)
+    scale: 2, // 3x scaling factor
+    height: 17, // Bar height, in millimeters
+    includetext:false, // Show the text below the barcode
+    textxalign: "center", // Align text to the center
+    textsize: 10,
+    format: "svg", 
+    letterSpacing:'5px'// Output format set to 'svg'
   });
+
 
   fs.writeFile(
     homedir + "/Documents" + "/db/barcode.svg",
-    svgString,
+    svg.toString("utf8"),
     (result) => {
       console.log(result);
 
       barcodeData = {
         style: {
-          width: "78%",
+          width: "70%",
           margin: "-30px 25px",
           display: "flex",
           justifyContent: "center",
@@ -606,7 +613,7 @@ const theAtext = {
             position: "relative",
             bottom: "15px",
           },
-          value: "Br " + minPayout.toLocaleString("en-us") + ".00",
+          value: "Br " + minPayout.toLocaleString("en-us") + (!hasDecimalPlaces(minPayout.toLocaleString("en-us")) ? ".00" : ""),
         },
         {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
@@ -655,9 +662,9 @@ const theAtext = {
             fontFamily: "Arial",
             fontWeight: "300",
             textAlign: "center",
-            width: "95%",
+            width: "90%",
             fontSize: "10px",
-            margin: "0px 10px 0px 2px",
+            margin: "0px 20px 0px 2px",
             position: "relative",
             top: "30px",
             letterSpacing: "8px",
@@ -716,7 +723,7 @@ console.log('reqbody:',req.body)
   const printJobId = generatePrintJobId(betSlipNumber, redeemedAmount, status);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -943,7 +950,7 @@ appServer.post("/printCancel", async (req, res) => {
   );
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1107,7 +1114,7 @@ appServer.post("/printSummary", async (req, res) => {
   const printJobId = generatePrintJobId(cancellations, redeemed, cashierName);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1385,7 +1392,7 @@ function printReceipt() {
   console.log(defaultprinter[0]);
   const printTime = new Date().toLocaleTimeString();
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1625,7 +1632,7 @@ function printReceipt() {
       value: "Line 1",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1638,7 +1645,7 @@ function printReceipt() {
       value: "Line 2",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1651,7 +1658,7 @@ function printReceipt() {
       value: "Line 3",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1664,7 +1671,7 @@ function printReceipt() {
       value: "Line 4",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1672,18 +1679,23 @@ function printReceipt() {
         top: "31%",
       },
     },
+   
     {
       type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table'
-      value: "*9234567890128*",
+      value: "*9843343333456*",
       style: {
-        fontFamily: "Arial",
-        fontSize: "8px",
+        fontFamily: "cursive",
+        fontSize: "9px",
         textAlign: "end",
         color: "black",
         position: "absolute",
-        left: "15%",
-        top: "38%",
-        letterSpacing: "10px",
+        top: "37%",
+       left: "-1.5%",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        marginTop:"20px",
+        letterSpacing:'9px'
       },
     },
     {
@@ -1691,7 +1703,7 @@ function printReceipt() {
       value: "Terms and conditions",
       style: {
         fontFamily: "Arial",
-        fontSize: "10px",
+        fontSize: "7px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1700,6 +1712,7 @@ function printReceipt() {
         width: "100%",
         display: "flex",
         justifyContent: "center",
+        marginTop:"20px"
       },
     },
     {
@@ -1716,38 +1729,55 @@ function printReceipt() {
         width: "100%",
         display: "flex",
         justifyContent: "center",
+          marginTop:"20px"
       },
     },
   ];
 
-  var svgString = barcode("9234567890128", "code128", {
-    width: "110",
-    barWidth: 1,
-    barHeight: 19,
-  });
-  fs.writeFile(homedir + "/Documents" + "/db/barcode.svg", svgString, (result) => {
-    console.log(result);
-
-    barcodeData = {
-      style: {
-        width: "75%",
-        position: "absolute",
-        top: "33%",
-        left: "11%",
-      },
-      type: "image",
-      path: homedir + "/Documents" + "/db/barcode.svg",
-      height: 20,
-    };
-    const printdata = [...data, barcodeData];
-    PosPrinter.print(printdata, options)
-      .then(console.log("printed"))
-
-      .catch((error) => {
-        console.log(error);
+  (async () => {
+    try {
+      // Generate the SVG barcode
+      const svg = await bwipjs.toSVG({
+        bcid: "code39", // Use 'code128' for 16-digit barcode
+        text: '9843343333456', // Encode only the original code (without asterisks)
+        scale: 2, // 3x scaling factor
+        height: 17, // Bar height, in millimeters
+        includetext:false, // Show the text below the barcode
+        textxalign: "center", // Align text to the center
+        textsize: 10,
+        format: "svg", 
+        letterSpacing:'5px'// Output format set to 'svg'
       });
-  });
-}
+  
+      
+      await fs.writeFile( homedir + "/Documents" + "/db/barcode.svg", svg.toString("utf8"),(result)=>{
+        barcodeData = {
+          style: {
+            width: "70%",
+            position: "absolute",
+            top: "33%",
+            left: "11%",
+          },
+          type: "image",
+          path: "code128-barcode.svg",
+          height: 20,
+        };
+        const printdata = [...data, barcodeData];
+        PosPrinter.print(printdata, options)
+          .then(console.log("printed"))
+    
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+      console.log("Barcode saved as code128-barcode.svg");
+    } catch (err) {
+      console.error("Error generating barcode:", err);
+    }
+  })();
+
+ 
+  }
 
 const createwindow = () => {
   var window = new BrowserWindow({
