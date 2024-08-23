@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, webContents } = require('electron');
+const { app, BrowserWindow, ipcMain, webContents } = require("electron");
 const port = 5002;
 
 const express = require("express");
@@ -16,60 +16,66 @@ const homedir = os.homedir();
 var defaultprinter = [];
 const moment = require("moment");
 const { barcode, qrcode, svg2url } = require("pure-svg-code");
-const { execSync,spawn } = require('child_process');
+const { execSync, spawn } = require("child_process");
 
-
-const batFilePath = homedir+'/Documents/chrome.bat';
+const batFilePath = homedir + "/Documents/chrome.bat";
 
 appServer.use(bodyParser.urlencoded({ extended: true }));
 appServer.use(bodyParser.json());
 appServer.use(express.json());
 function killChromeProcesses() {
   try {
-      execSync('taskkill /F /IM chrome.exe');
-      console.log('All Chrome processes killed.');
+    execSync("taskkill /F /IM chrome.exe");
+    console.log("All Chrome processes killed.");
   } catch (error) {
-      console.error('Failed to kill Chrome processes:', error.message);
+    console.error("Failed to kill Chrome processes:", error.message);
   }
 }
 
 // Path to Chrome executable (quoted to handle spaces)
-const chromePath = `"${path.join('C:', 'Program Files', 'Google', 'Chrome', 'Application', 'chrome.exe')}"`;
+const chromePath = `"${path.join(
+  "C:",
+  "Program Files",
+  "Google",
+  "Chrome",
+  "Application",
+  "chrome.exe"
+)}"`;
 
 // Function to check if Chrome executable exists
 function checkChromePath() {
   try {
-      execSync(`if not exist ${chromePath} exit /b 1`, { shell: true });
-      console.log('Chrome executable found.');
-      return true;
+    execSync(`if not exist ${chromePath} exit /b 1`, { shell: true });
+    console.log("Chrome executable found.");
+    return true;
   } catch (error) {
-      console.error('Chrome executable not found. Please check the path.');
-      return false;
+    console.error("Chrome executable not found. Please check the path.");
+    return false;
   }
 }
 
 // Function to start Chrome with the necessary flags
 function startChrome() {
   const chromeFlags = [
-      '--disable-web-security',
-      '--user-data-dir="C:\\chrome_dev_temp"',
-      '--allow-file-access-from-files',
-      '--enable-local-file-accesses',
-      'http://staketestbucket.s3-website.us-east-2.amazonaws.com/index.html'
+    "--disable-web-security",
+    '--user-data-dir="C:\\chrome_dev_temp"',
+    "--allow-file-access-from-files",
+    "--enable-local-file-accesses",
+    "http://staketestbucket.s3-website.us-east-2.amazonaws.com/index.html",
   ];
 
   const chrome = spawn(chromePath, chromeFlags, { shell: true });
 
-  chrome.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
+  chrome.stdout.on("data", (data) => {
+    console.log(`stdout: ${data}`);
   });
 
-  chrome.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
+  chrome.stderr.on("data", (data) => {
+    console.error(`stderr: ${data}`);
   });
 
-  chrome.on('close', (code) => {
-      console.log(`Chrome process exited with code ${code}`);
+  chrome.on("close", (code) => {
+    console.log(`Chrome process exited with code ${code}`);
   });
 }
 
@@ -100,7 +106,7 @@ appServer.post("/PrintResult", async (req, res) => {
   console.log("Data", data);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -272,7 +278,7 @@ appServer.post("/PrintResult", async (req, res) => {
       value:
         data.Game === "Keno" || data.Game === "Spin And Win"
           ? ""
-          : data.Market[1] +','+ data.Market[2],
+          : data.Market[1] + "," + data.Market[2],
       style: {
         position: "absolute",
         left: "5%",
@@ -298,7 +304,7 @@ appServer.post("/PrintResult", async (req, res) => {
       value:
         data.Game === "Keno" || data.Game === "Spin And Win"
           ? ""
-          : data.Market[4] ,
+          : data.Market[4],
       style: {
         position: "absolute",
         left: "5%",
@@ -317,8 +323,8 @@ appServer.post("/PrintResult", async (req, res) => {
         top: "28%",
         fontSize: "10px",
         fontFamily: "Arial",
-        fontWeight: 'bold',
-        marginTop:'10px'
+        fontWeight: "bold",
+        marginTop: "10px",
       },
     },
   ];
@@ -362,7 +368,7 @@ appServer.post("/printTicket", async (req, res) => {
   const printJobId = generatePrintJobId(betSlipNumber, stake, minPayout);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -372,7 +378,9 @@ appServer.post("/printTicket", async (req, res) => {
   };
 
   const individualTickets = [];
-  const hasPlayerName=tickets.some(ticketer=>ticketer.hasOwnProperty('playerName'))
+  const hasPlayerName = tickets.some((ticketer) =>
+    ticketer.hasOwnProperty("playerName")
+  );
   for (let ticket of tickets) {
     const keys = Object.keys(ticket);
 
@@ -385,11 +393,11 @@ appServer.post("/printTicket", async (req, res) => {
     ) {
       title = "Heads and Tails";
     }
-console.log('title:',title)
+    console.log("title:", title);
     for (let key of keys) {
       if (key === "stake") {
         const right = {
-          type: "text", 
+          type: "text",
           value: "Br " + ticket[key].toLocaleString("en-us") + ".00",
           style: {
             fontFamily: "arial",
@@ -420,7 +428,6 @@ console.log('title:',title)
         left !== null && individualTickets.push(right);
         right !== null && individualTickets.push(left);
       } else {
-       
         const left = {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
           value:
@@ -435,13 +442,15 @@ console.log('title:',title)
                 " " +
                 ticket["selected"].split(" ")[1]
               : key !== "oddType" && key !== "playerName" && key !== "selected"
-              ? ticket[key]:key === "selected"?ticket['selected']
+              ? ticket[key]
+              : key === "selected"
+              ? ticket["selected"]
               : "",
           style: {
             fontFamily: "arial",
             fontWeight: "300",
             textAlign: "left",
-            fontSize: "11px",
+            fontSize: "13px",
             margin: key === "game" ? "0px 0px 0px 10px" : "0px 0px 0px 20px",
             position: "relative",
             bottom: "10px",
@@ -489,7 +498,7 @@ console.log('title:',title)
     },
     {
       type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-      value: gameStart.split(' ')[0]+' '+gameStart.split(' ')[1],
+      value: gameStart.split(" ")[0] + " " + gameStart.split(" ")[1],
       style: {
         fontFamily: "arial",
         fontWeight: "300",
@@ -504,15 +513,21 @@ console.log('title:',title)
 
   console.log("request incoming....");
 
-  var svgString = barcode(betSlipNumber.toLocaleString(), "code128", {
-    width: "100",
-    barWidth: 5,
-    barHeight: 20,
+  const svg = await bwipjs.toSVG({
+    bcid: "code39", // Use 'code128' for 16-digit barcode
+    text: betSlipNumber, // Encode only the original code (without asterisks)
+    scale: 1, // 3x scaling factor
+    height: 17, // Bar height, in millimeters
+    includetext: false, // Show the text below the barcode
+    textxalign: "center", // Align text to the center
+    textsize: 10,
+    format: "svg",
+    letterSpacing: "5px", // Output format set to 'svg'
   });
 
   fs.writeFile(
-    homedir + "/Documents" + "/db/barcode.svg",
-    svgString,
+    homedir + "/Documents" + "/barcode.svg",
+    svg.toString("utf8"),
     (result) => {
       console.log(result);
 
@@ -526,31 +541,28 @@ console.log('title:',title)
           marginTop: "2px",
         },
         type: "image",
-        path: homedir + "/Documents" + "/db/barcode.svg",
+        path: homedir + "/Documents" + "/barcode.svg",
         height: 20,
       };
-        
-      
-      
 
       const filePath = path.join(__dirname, "copystamp.jpg");
 
       console.log("barcode data: ", barcodeData);
-const theAtext = {
-  type: "text",
-  value: "A0A8CD97D9",
-  style: {
-    fontFamily: "Arial",
-    fontWeight: "300",
-    textAlign: "center",
-    width: "100%",
-    fontSize: "10px",
-    margin: "0px 0px 0px 2px",
-    position: "relative",
-    top: "30px",
-    marginLeft:'-10px'
-  },
-};
+      const theAtext = {
+        type: "text",
+        value: "A0A8CD97D9",
+        style: {
+          fontFamily: "Arial",
+          fontWeight: "300",
+          textAlign: "center",
+          width: "100%",
+          fontSize: "10px",
+          margin: "0px 0px 0px 2px",
+          position: "relative",
+          top: "30px",
+          marginLeft: "-10px",
+        },
+      };
       const endData = [
         {
           type: "text",
@@ -606,7 +618,10 @@ const theAtext = {
             position: "relative",
             bottom: "15px",
           },
-          value: "Br " + minPayout.toLocaleString("en-us") + ".00",
+          value:
+            "Br " +
+            minPayout.toLocaleString("en-us") +
+            (!hasDecimalPlaces(minPayout.toLocaleString("en-us")) ? ".00" : ""),
         },
         {
           type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
@@ -655,9 +670,9 @@ const theAtext = {
             fontFamily: "Arial",
             fontWeight: "300",
             textAlign: "center",
-            width: "95%",
+            width: "90%",
             fontSize: "10px",
-            margin: "0px 10px 0px 2px",
+            margin: "0px 20px 0px 2px",
             position: "relative",
             top: "30px",
             letterSpacing: "8px",
@@ -708,15 +723,15 @@ appServer.post("/printRedeem", async (req, res) => {
     betSlipNumber,
     redeemedAmount,
     status,
-    tickets
+    tickets,
   } = req.body;
 
   const printTime = new Date().toLocaleTimeString();
-console.log('reqbody:',req.body)
+  console.log("reqbody:", req.body);
   const printJobId = generatePrintJobId(betSlipNumber, redeemedAmount, status);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -771,10 +786,10 @@ console.log('reqbody:',req.body)
       },
     },
   ];
-  const winnigTicket = []
+  const winnigTicket = [];
 
   for (let ticket in tickets) {
-    const key=Object.keys(ticket)
+    const key = Object.keys(ticket);
     winnigTicket.push(
       {
         type: "text",
@@ -840,7 +855,6 @@ console.log('reqbody:',req.body)
         fontWeight: "bold",
         textAlign: "center",
         fontSize: "12px",
-        
       },
     },
   ];
@@ -943,7 +957,7 @@ appServer.post("/printCancel", async (req, res) => {
   );
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1107,7 +1121,7 @@ appServer.post("/printSummary", async (req, res) => {
   const printJobId = generatePrintJobId(cancellations, redeemed, cashierName);
 
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1385,7 +1399,7 @@ function printReceipt() {
   console.log(defaultprinter[0]);
   const printTime = new Date().toLocaleTimeString();
   const options = {
-    preview: true,
+    preview: false,
     printerName: defaultprinter[0],
     silent: true,
     margin: "0 0 0 0",
@@ -1625,7 +1639,7 @@ function printReceipt() {
       value: "Line 1",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1638,7 +1652,7 @@ function printReceipt() {
       value: "Line 2",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1651,7 +1665,7 @@ function printReceipt() {
       value: "Line 3",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1664,7 +1678,7 @@ function printReceipt() {
       value: "Line 4",
       style: {
         fontFamily: "Arial",
-        fontSize: "8px",
+        fontSize: "10px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1672,17 +1686,22 @@ function printReceipt() {
         top: "31%",
       },
     },
+
     {
       type: "text", // 'text' | 'barCode' | 'qrCode' | 'image' | 'table'
-      value: "*9234567890128*",
+      value: "*9843343333456*",
       style: {
-        fontFamily: "Arial",
-        fontSize: "8px",
+        fontFamily: "cursive",
+        fontSize: "9px",
         textAlign: "end",
         color: "black",
         position: "absolute",
-        left: "15%",
-        top: "38%",
+        top: "37%",
+        left: "-1.5%",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        marginTop: "10px",
         letterSpacing: "10px",
       },
     },
@@ -1691,7 +1710,7 @@ function printReceipt() {
       value: "Terms and conditions",
       style: {
         fontFamily: "Arial",
-        fontSize: "10px",
+        fontSize: "7px",
         textAlign: "end",
         color: "black",
         position: "absolute",
@@ -1700,6 +1719,7 @@ function printReceipt() {
         width: "100%",
         display: "flex",
         justifyContent: "center",
+        marginTop: "20px",
       },
     },
     {
@@ -1716,37 +1736,55 @@ function printReceipt() {
         width: "100%",
         display: "flex",
         justifyContent: "center",
+        marginTop: "20px",
       },
     },
   ];
 
-  var svgString = barcode("A9234567890128B", "codabar", {
-    width: "50",
-    barWidth: 1,
-    barHeight: 19,
-  });
-  fs.writeFile(homedir + "/Documents" + "/db/barcode.svg", svgString, (result) => {
-    console.log(result);
-
-    barcodeData = {
-      style: {
-        width: "75%",
-        position: "absolute",
-        top: "33%",
-        left: "11%",
-      },
-      type: "image",
-      path: homedir + "/Documents" + "/db/barcode.svg",
-      height: 20,
-    };
-    const printdata = [...data, barcodeData];
-    PosPrinter.print(printdata, options)
-      .then(console.log("printed"))
-
-      .catch((error) => {
-        console.log(error);
+  (async () => {
+    try {
+      // Generate the SVG barcode
+      const svg = await bwipjs.toSVG({
+        bcid: "code39", // Use 'code128' for 16-digit barcode
+        text: "9843343333456", // Encode only the original code (without asterisks)
+        scale: 2, // 3x scaling factor
+        height: 17, // Bar height, in millimeters
+        includetext: false, // Show the text below the barcode
+        textxalign: "center", // Align text to the center
+        textsize: 10,
+        format: "svg",
+        letterSpacing: "5px", // Output format set to 'svg'
       });
-  });
+
+      await fs.writeFile(
+        homedir + "/Documents" + "/barcode.svg",
+        svg.toString("utf8"),
+        (result) => {
+          barcodeData = {
+            style: {
+              width: "75%",
+              position: "absolute",
+              top: "33%",
+              left: "11%",
+            },
+            type: "image",
+            path: homedir + "/Documents" + "/barcode.svg",
+            height: 20,
+          };
+          const printdata = [...data, barcodeData];
+          PosPrinter.print(printdata, options)
+            .then(console.log("printed"))
+
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      );
+      console.log("Barcode saved as code128-barcode.svg");
+    } catch (err) {
+      console.error("Error generating barcode:", err);
+    }
+  })();
 }
 
 const createwindow = () => {
@@ -1806,23 +1844,23 @@ app.whenReady().then(() => {
   const server = appServer.listen(port, "0.0.0.0", () => {
     console.log(`Server is running on http://127.0.0.1:${port}`);
   });
-// try{
-// exec(`"${batFilePath}"`, (error, stdout, stderr) => {
-//     if (error) {
-//         console.error(`Error executing batch file: ${error.message}`);
-//         return;
-//     }
+  // try{
+  // exec(`"${batFilePath}"`, (error, stdout, stderr) => {
+  //     if (error) {
+  //         console.error(`Error executing batch file: ${error.message}`);
+  //         return;
+  //     }
 
-//     if (stderr) {
-//         console.error(`stderr: ${stderr}`);
-//         return;
-//     }
+  //     if (stderr) {
+  //         console.error(`stderr: ${stderr}`);
+  //         return;
+  //     }
 
-//     console.log(`stdout: ${stdout}`);
-// });
-// }
-// catch(err){
-//   console.log(err)
-// }
+  //     console.log(`stdout: ${stdout}`);
+  // });
+  // }
+  // catch(err){
+  //   console.log(err)
+  // }
   createwindow();
 });
